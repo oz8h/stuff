@@ -818,7 +818,7 @@ local Success, Error = pcall(function()
 
 				local ElementLibrary = {}
 
-				local function ToggleFunction(Container, Enabled, Callback, DisabledKeybind, Title, Keybind) -- fpr color picker
+				local function ToggleFunction(Container, Enabled, Callback, DisabledKeybind, Title, Description, Keybind) -- fpr color picker
 					local lol = game:GetService("HttpService"):GenerateGUID(false):gsub("-", ""):lower()
 					local Switch = Container.Switch
 					local Hitbox = Container.Hitbox
@@ -851,11 +851,25 @@ local Success, Error = pcall(function()
 						keys_lol[lol] = {key,Callback}
 						Container.Parent.Title.Text = old_title .. " [".. tostring(keys[key] or key):gsub("Enum.KeyCode.", "") .."]"
 					end
+					
+					if Description then
+						AddConnection(CConnect(Container.Parent.Title.MouseEnter, function()
+							old_title = Container.Parent.Title.Text
+							task.wait()
+							Container.Parent.Title.Text = Description
+						end));
+						
+						AddConnection(CConnect(Container.Parent.Title.MouseLeave, function()
+							Container.Parent.Title.Text = old_title
+						end));
+					end
 
 					if not (DisabledKeybind or false) then
 						AddConnection(CConnect(Container.Parent.Title.MouseButton1Click, function()
 							if not bruh and not binding then
-								Container.Parent.Title.Text ..= " [...]"
+								if old_title == Description then old_title = Title end
+								task.wait()
+								Container.Parent.Title.Text = old_title .. " [...]"
 								binding = InputService.InputBegan:Connect(function(input, gpe)
 									if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode then
 										bruh = true
@@ -887,16 +901,16 @@ local Success, Error = pcall(function()
 					end
 				end
 
-				function ElementLibrary.Toggle(Title, Enabled, Callback, DisabledKeybind, keybind)
+				function ElementLibrary.Toggle(Title, Enabled, Callback, DisabledKeybind, description, keybind)
 					local Toggle = Clone(GuiObjects.Elements.Toggle);
 					local Container = Toggle.Container
-					ToggleFunction(Container, Enabled, Callback, DisabledKeybind, Title, keybind);
+					ToggleFunction(Container, Enabled, Callback, DisabledKeybind, Title, description, keybind);
 
 					Toggle.Title.Text = Title
 					Toggle.Parent = Section.Options
 				end
 
-				function ElementLibrary.Button(Text, Callback, DisabledKeybind, keybind)
+				function ElementLibrary.Button(Text, Callback, DisabledKeybind, description, keybind)
 					local lol = game:GetService("HttpService"):GenerateGUID(false):gsub("-", ""):lower()
 					local Toggle = Clone(GuiObjects.Elements.Button);
 					local key, old_title, binding, bruh;
@@ -913,7 +927,18 @@ local Success, Error = pcall(function()
 						keys_lol[lol] = {key,Callback}
 						Toggle.keybind.Text = "[".. tostring(keys[key] or key):gsub("Enum.KeyCode.", "") .."]"
 					end
-
+					
+					if description then
+						AddConnection(CConnect(Toggle.Title.MouseEnter, function()
+							old_title = Toggle.Title.Text
+							task.wait()
+							Toggle.Title.Text = description
+						end));
+						AddConnection(CConnect(Toggle.Title.MouseLeave, function()
+							Toggle.Title.Text = old_title
+						end));
+					end
+					
 					if not (DisabledKeybind or false) then
 						AddConnection(CConnect(Toggle.keybind.MouseButton1Click, function()
 							if not bruh and not binding then
@@ -951,6 +976,7 @@ local Success, Error = pcall(function()
 					local Toggle = Clone(GuiObjects.Elements.TextLabel);
 					Toggle.Title.Text = Text
 					Toggle.Parent = Section.Options
+					
 					return {changeText = function(Text)
 						Toggle.Title.Text = Text
 					end}
