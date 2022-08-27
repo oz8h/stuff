@@ -1310,3 +1310,6 @@ function UILibrary:LoadWindow(Title, Size, Theme, autoIdle)
 	end
 
 	return WindowLibrary
+end
+
+return UILibrary
