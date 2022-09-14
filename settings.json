@@ -1,6 +1,1 @@
-{
-  "enabled": true,
-  "detection": {
-      "mono": true, "others": true
-  }
-}
+true
